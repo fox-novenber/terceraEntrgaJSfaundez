@@ -1,0 +1,55 @@
+*{
+padding: 0;
+margin: 0;
+}
+
+h1{
+    display: flex;
+    justify-content: center;
+    padding: 15px;
+}
+
+.cajaBuscador {
+    display: flex;
+    justify-content: center;
+    
+}
+
+#tarjetas{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.imagen{
+    width: 250px;
+    height: 240px;
+}
+
+.estiloTarjeta {
+    margin: 10px;
+    border: 2px solid greenyellow;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 5px;
+
+}
+
+h3{
+    float:right;
+    color: blue;
+}
+
+#botonBuscar {
+    margin-left: 5px;
+    margin: 0 px;
+    border: 2px solid black;
+    border-radius: 5px;
+}
+.fachaBotones {
+    margin-left: 5px;
+    margin: 2 px;}
+.compras{
+    background-color: aquamarine;
+}
