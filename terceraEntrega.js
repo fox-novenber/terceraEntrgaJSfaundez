@@ -1,134 +1,121 @@
-
 const verduleria = [
-    {id: 1, producto: "manzana", precio: 150, origen: "nacional", Imagen:"manzana.jpeg"},
-    {id: 2, producto: "naranja", precio: 100, origen: "nacional", Imagen:"naranja.jpeg"},
-    {id: 3, producto: "banana", precio: 200, origen: "importado", Imagen:"banana.jpeg"},
-    {id: 4, producto: "peras", precio: 80, origen: "nacional", Imagen:"pera.jpeg"},
-    {id: 5, producto: "frutillas", precio: 350, origen: "importado", Imagen:"frutilla.jpeg"},
-    {id: 6, producto: "tomates", precio: 85, origen: "nacional", Imagen:"tomate.jpeg"}
+    { id: 1, producto: "manzana",   precio: 150, origen: "nacional",  imagen: "manzana.jpeg" },
+    { id: 2, producto: "naranja",   precio: 100, origen: "nacional",  imagen: "naranja.jpeg" },
+    { id: 3, producto: "banana",    precio: 200, origen: "importado", imagen: "banana.jpeg" },
+    { id: 4, producto: "peras",     precio: 80,  origen: "nacional",  imagen: "pera.jpeg" },
+    { id: 5, producto: "frutillas", precio: 350, origen: "importado", imagen: "frutilla.jpeg" },
+    { id: 6, producto: "tomates",   precio: 85,  origen: "nacional",  imagen: "tomate.jpeg" }
 ];
 
-let tarjetas = document.getElementById("tarjetas");
-let carrito = [];
+const tarjetas = document.getElementById("tarjetas");
+const carritoContainer = document.getElementById("carrito");
+const totalSpan = document.getElementById("total");
+const buscador = document.getElementById("buscador");
+const botonesFiltro = document.querySelectorAll(".filtro");
 
-// Obtener datos del carrito desde el Local Storage (si existen)
-const carritoJSON = localStorage.getItem("carrito");
-if (carritoJSON) {
-    carrito = JSON.parse(carritoJSON);
-}
+// Carrito guardado en Local Storage (o vacío si no hay nada)
+let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+let origenActual = "todos";
 
-function crearTarjetas(verduleria) {
+function crearTarjetas(lista) {
     tarjetas.innerHTML = "";
-    verduleria.forEach(elemento => {
-        let tarjetita = document.createElement("div");
-        tarjetita.className = "estiloTarjeta";
-        
-        tarjetita.innerHTML = `
-            <h3>${elemento.producto}</h3>
-            <img class="imagen" src="imagenes/${elemento.Imagen}">
-            <h3>${elemento.precio}$</h3>
-            <button onclick="agregarAlCarrito(${elemento.id})">Agregar al carrito</button>
+    if (lista.length === 0) {
+        tarjetas.innerHTML = `<p class="vacio">No se encontraron productos.</p>`;
+        return;
+    }
+    lista.forEach(p => {
+        const tarjeta = document.createElement("div");
+        tarjeta.className = "estiloTarjeta";
+        tarjeta.innerHTML = `
+            <img class="imagen" src="imagenes/${p.imagen}" alt="${p.producto}">
+            <h3>${p.producto}</h3>
+            <span class="origen">${p.origen}</span>
+            <span class="precio">$${p.precio}</span>
+            <button onclick="agregarAlCarrito(${p.id})">Agregar al carrito</button>
         `;
-        tarjetas.appendChild(tarjetita);
+        tarjetas.appendChild(tarjeta);
     });
 }
 
 function mostrarCarrito() {
-    let carritoContainer = document.getElementById("carrito");
     carritoContainer.innerHTML = "";
+    if (carrito.length === 0) {
+        carritoContainer.innerHTML = `<p class="vacio">El carrito está vacío.</p>`;
+    }
     carrito.forEach(item => {
-        let itemCarrito = document.createElement("div");
-        itemCarrito.className = "itemCarrito";
-        
-        itemCarrito.innerHTML = `
-            <h3>${item.producto}</h3>
-            <p>Precio: ${item.precio}$</p>
-            <p>Cantidad: ${item.cantidad}</p>
-            <button  class="fachaBotones" onclick="restarCantidad(${item.id})">-</button>
-            <button class="fachaBotones" onclick="sumarCantidad(${item.id})">+</button>
-            <button class="fachaBotones" onclick="eliminarItem(${item.id})">Eliminar</button>
+        const fila = document.createElement("div");
+        fila.className = "itemCarrito";
+        fila.innerHTML = `
+            <span>${item.producto} × ${item.cantidad}</span>
+            <span>$${item.precio * item.cantidad}</span>
+            <div>
+                <button onclick="cambiarCantidad(${item.id}, -1)">-</button>
+                <button onclick="cambiarCantidad(${item.id}, 1)">+</button>
+                <button onclick="eliminarItem(${item.id})">🗑</button>
+            </div>
         `;
-        carritoContainer.appendChild(itemCarrito);
+        carritoContainer.appendChild(fila);
     });
-    
-    // Guardar los datos del carrito en el Local Storage
+
+    const total = carrito.reduce((suma, item) => suma + item.precio * item.cantidad, 0);
+    totalSpan.textContent = total;
+
     localStorage.setItem("carrito", JSON.stringify(carrito));
 }
 
 function agregarAlCarrito(id) {
-    let producto = verduleria.find(item => item.id === id);
-    let itemCarrito = carrito.find(item => item.id === id);
-    
-    if (itemCarrito) {
-        itemCarrito.cantidad++;
+    const item = carrito.find(i => i.id === id);
+    if (item) {
+        item.cantidad++;
     } else {
-        carrito.push({...producto, cantidad: 1});
+        const producto = verduleria.find(p => p.id === id);
+        carrito.push({ ...producto, cantidad: 1 });
     }
-    
     mostrarCarrito();
 }
 
-function restarCantidad(id) {
-    let itemCarrito = carrito.find(item => item.id === id);
-    
-    if (itemCarrito) {
-        itemCarrito.cantidad--;
-        if (itemCarrito.cantidad === 0) {
-            eliminarItem(id);
-        }
+// Suma (+1) o resta (-1). Si llega a 0 se elimina.
+function cambiarCantidad(id, cambio) {
+    const item = carrito.find(i => i.id === id);
+    if (!item) return;
+    item.cantidad += cambio;
+    if (item.cantidad <= 0) {
+        eliminarItem(id);
+    } else {
+        mostrarCarrito();
     }
-    
-    mostrarCarrito();
-}
-
-function sumarCantidad(id) {
-    let itemCarrito = carrito.find(item => item.id === id);
-    
-    if (itemCarrito) {
-        itemCarrito.cantidad++;
-    }
-    
-    mostrarCarrito();
 }
 
 function eliminarItem(id) {
-    carrito = carrito.filter(item => item.id !== id);
+    carrito = carrito.filter(i => i.id !== id);
     mostrarCarrito();
 }
 
-let buscador = document.getElementById("buscador");
+// Un solo filtro que combina texto + origen
+function filtrar() {
+    const texto = buscador.value.toLowerCase().trim();
+    const lista = verduleria.filter(p =>
+        p.producto.includes(texto) &&
+        (origenActual === "todos" || p.origen === origenActual)
+    );
+    crearTarjetas(lista);
+}
+
 buscador.addEventListener("input", filtrar);
 
-let boton = document.getElementById("botonBuscar");
-boton.addEventListener("click", filtrar);
+botonesFiltro.forEach(boton => {
+    boton.addEventListener("click", () => {
+        origenActual = boton.dataset.origen;
+        botonesFiltro.forEach(b => b.classList.remove("activo"));
+        boton.classList.add("activo");
+        filtrar();
+    });
+});
 
-let botonImportados = document.getElementById("botonImportado");
-botonImportados.addEventListener("click", filtrarPorCategoria);
-
-let botonNacionales = document.getElementById("botonNacional");
-botonNacionales.addEventListener("click", filtrarPorCategoria);
-
-function filtrar() {
-    let valorBusqueda = buscador.value.toLowerCase();
-    let arrayFiltrado = verduleria.filter(fruta => 
-        fruta.producto.toLowerCase().includes(valorBusqueda) ||
-        fruta.origen.toLowerCase().includes(valorBusqueda)
-    );
-    crearTarjetas(arrayFiltrado);
-}
-
-function filtrarPorCategoria(e) {
-    let categoria = e.target.value;
-    let arrayFiltrado;
-    if (categoria === "importado") {
-        arrayFiltrado = verduleria.filter(fruta => fruta.origen === "importado");
-    } else if (categoria === "nacional") {
-        arrayFiltrado = verduleria.filter(fruta => fruta.origen === "nacional");
-    } else {
-        arrayFiltrado = verduleria;
-    }
-    crearTarjetas(arrayFiltrado);
-}
+document.getElementById("vaciar").addEventListener("click", () => {
+    carrito = [];
+    mostrarCarrito();
+});
 
 crearTarjetas(verduleria);
 mostrarCarrito();
