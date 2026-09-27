@@ -1,55 +1,96 @@
-*{
-padding: 0;
-margin: 0;
+* { padding: 0; margin: 0; box-sizing: border-box; }
+
+body {
+    font-family: system-ui, sans-serif;
+    background: #f4f8f1;
+    color: #222;
 }
 
-h1{
-    display: flex;
-    justify-content: center;
-    padding: 15px;
+header {
+    background: #3a7d2c;
+    color: white;
+    text-align: center;
+    padding: 20px;
 }
+
+button {
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    background: #3a7d2c;
+    color: white;
+    font-weight: bold;
+}
+button:hover { background: #2c5f21; }
 
 .cajaBuscador {
     display: flex;
-    justify-content: center;
-    
-}
-
-#tarjetas{
-    display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    gap: 8px;
+    padding: 16px;
+}
+#buscador {
+    padding: 8px 12px;
+    border: 2px solid #3a7d2c;
+    border-radius: 6px;
+    min-width: 220px;
+}
+.filtro { background: #9bc48f; }
+.filtro.activo { background: #3a7d2c; }
+
+main {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 0 16px 16px;
 }
 
-.imagen{
-    width: 250px;
-    height: 240px;
+#tarjetas {
+    flex: 3;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
 }
 
 .estiloTarjeta {
-    margin: 10px;
-    border: 2px solid greenyellow;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.1);
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
-    border-radius: 5px;
+    gap: 6px;
+    padding-bottom: 12px;
+    text-transform: capitalize;
+}
+.imagen { width: 100%; height: 180px; object-fit: cover; }
+.precio { color: #3a7d2c; font-size: 1.2em; font-weight: bold; }
+.origen { font-size: .8em; color: #777; }
 
+.compras {
+    flex: 1;
+    min-width: 260px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.1);
+    padding: 16px;
+    position: sticky;
+    top: 16px;
 }
-
-h3{
-    float:right;
-    color: blue;
+.itemCarrito {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    text-transform: capitalize;
 }
-
-#botonBuscar {
-    margin-left: 5px;
-    margin: 0 px;
-    border: 2px solid black;
-    border-radius: 5px;
-}
-.fachaBotones {
-    margin-left: 5px;
-    margin: 2 px;}
-.compras{
-    background-color: aquamarine;
-}
+.itemCarrito button { padding: 4px 8px; }
+.total { font-size: 1.2em; font-weight: bold; margin: 12px 0; }
+#vaciar { background: #c0392b; width: 100%; }
+.vacio { color: #999; padding: 8px 0; }
